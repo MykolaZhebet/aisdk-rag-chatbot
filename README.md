@@ -1,5 +1,8 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Project inspired by youtube: [`
+Build a RAG Chatbot from Scratch`](https://www.youtube.com/watch?v=3E5OxozYuA8)
+
 ## Getting Started
 
 First, run the development server:
@@ -34,3 +37,34 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+### Local Ollama models were used:
+  @see  https://ollama.com/library/gemma3
+   ```ollama run gemma3:4b-it-qat```
+
+   Ollama local model for embedding nomic-embed-text (768 dimensions) https://ollama.com/library/nomic-embed-text:v1.5
+  ```ollama run nomic-embed-text:v1.5
+  curl http://localhost:11434/api/embeddings -d '{
+  "model": "nomic-embed-text:v1.5",
+  "prompt": "The sky is blue because of Rayleigh scattering"
+}'
+  ```
+
+### AI SDK:
+   https://ai-sdk.dev/docs/ai-sdk-core/generating-text
+   - https://ai-sdk.dev/providers/community-providers/ollama
+   - UI elements: https://ai-sdk.dev/elements/overview
+
+- Use Clerk as authentication middleware: https://dashboard.clerk.com/apps/app_33kGQLkjA9LZFu7uSJAXVGBnyMi/instances/ins_33kGQEU34WIILU1f3bvdDCzCgqr
+
+
+### Drizzle:
+Generate custom migration: 
+```npx drizzle-kit generate --custom```
+Generate migration file for changes in db schema:
+```npx drizzle-kit generate```
+#### Migrate:
+```npx drizzle-kit migrate```
+#### Check if ext. vector exists:
+```select extname, extversion from pg_extension where extname = 'vector';```
