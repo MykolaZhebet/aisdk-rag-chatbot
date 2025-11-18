@@ -5,9 +5,6 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from 'ai';
 
 export default function StreamPage() { 
-    // const { input, handleInputChange, handleSubmit, completion, isLoading, error, stop } = useCompletion({
-    //     api: '/api/completion/stream',
-    // });
      
     const { messages, sendMessage, status, error, stop } = useChat({
         transport: new DefaultChatTransport({
@@ -17,7 +14,7 @@ export default function StreamPage() {
 
     const [input, setInput] = useState('');
 
-    const handleSubmit = (e: React.FormElement<HTMLFormElement>) => { 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { 
         e.preventDefault();
         sendMessage({text: input});
         setInput('');
