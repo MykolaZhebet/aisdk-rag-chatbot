@@ -5,13 +5,22 @@ config({ path: ".env.local" });
 
 export async function POST(req: Request) {
     try {
+        const { prompt } = await req.json();
+        const result = streamText({
+            model: ollama(process.env.CHAT_MODEL!),
+            prompt
+        });
 
-    
-    const { prompt } = await req.json();
-    const result = streamText({
-        model: ollama(process.env.CHAT_MODEL!),
-        prompt
-    });
+        result.usage.then((usage) => {
+            console.log(
+                {
+                    inputTokens: usage.inputTokens,
+                    outputTokens: usage.outputTokens,
+                    totalTokens: usage.totalTokens
+                }
+
+            );
+        });
 
         return result.toUIMessageStreamResponse();
     } catch (error) {
