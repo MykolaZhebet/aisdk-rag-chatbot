@@ -10,8 +10,28 @@ export async function POST(req: Request) {
     
         const result = streamText({
             model: ollama(process.env.CHAT_MODEL!),
-            system: 'You are a helpufl assistant',
-            messages: convertToModelMessages(messages),
+
+
+            // system: 'You are a helpuful assistant',
+            messages: [
+                // {
+                //     role: 'system',
+                //     content: 'You are a teacher. Focus on practical simple examples',
+                // },
+                {
+                    role: 'system',
+                    content: 'Convert user questions about React into code examples. Without extra text before and after answer',
+                },
+                {
+                    role: 'user',
+                    content: 'How to toggle a boolean?'
+                },
+                {
+                    role: 'assistant',
+                    content: 'const [isOpen, setIsOpen] = useState(false);\n const toggle = () => setIsOpen(!isOpen);'
+                },
+                ...convertToModelMessages(messages)
+            ],
         });
 
         result.usage.then((usage) => {
