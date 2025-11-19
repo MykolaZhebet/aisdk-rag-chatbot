@@ -51,10 +51,20 @@ export default function MultiModalChatPage() {
                                                 height={500}
                                             />
                                         }
-                                        return <span>Unsuported file type</span>;
+                                        if (part.mediaType?.startsWith('application/pdf')) {
+                                            return <iframe
+                                                key={`${message.id}-${index}-pdf`}
+                                                src={part.url}
+                                                width='300'
+                                                height='300'
+                                                title={part.filename ?? `attachment-${index}`}
+                                            />
+                                        }
+                                        console.log('mediatype of file: ',part.mediaType);
+                                        return <span key={index}>Unsuported file type</span>;
                                     
                                     default:
-                                        return null;
+                                        return <span key={index}>Unsuported type of chat message: { part.type}</span>;
                                     }
                             })}</div>
                             <br />
