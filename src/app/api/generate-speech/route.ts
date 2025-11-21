@@ -3,6 +3,8 @@ import { ollama } from 'ollama-ai-provider-v2';
 import { experimental_generateSpeech as generateSpeech } from "ai";
 import { Experimental_SpeechResult as SpeechResult } from "ai";
 import { GeneratedFile } from 'ai';
+import { openai } from "@ai-sdk/openai";
+import { NextResponse } from 'next/server';
 config({ path: ".env.local" });
 
 export async function POST(req: Request) { 
@@ -11,18 +13,16 @@ export async function POST(req: Request) {
 
         // const audio: SpeechResult = await generateSpeech({
         const { audio }: {audio: GeneratedFile} = await generateSpeech({
-            model: ollama.speechModel(process.env.AUDIO_GENERATION_MODEL!),
+            model: (ollama?.speechModel
+                        ? ollama?.speechModel(process.env.AUDIO_GENERATION_MODEL!)
+                        : openai.speech("gpt-4.1-mini")
+            ),
             text,
         })
 
-        audio.uint8Array
-
-
-        return new Response(audio.uint8Array, {
-            headers: {
-                'Content-Type': audio.mediaType || 'audio/mpeg',
-            },
-        })
+        return new Response(audio.uint8Array.buffer as ArrayBuffer, {
+            headers: { 'Content-Type': 'application/octet-stream' },
+        });
     } catch (error) { 
         console.error("Error generation speech:", error);
         return new Response("Failed to generate speech",{status: 500});

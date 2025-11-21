@@ -1,6 +1,7 @@
 import { experimental_transcribe as transcribe} from "ai";
 import { config } from "dotenv";
 import { ollama } from 'ollama-ai-provider-v2';
+import { openai } from "@ai-sdk/openai";
 config({ path: ".env.local" });
 export async function POST(req: Request) {
     try {
@@ -15,7 +16,9 @@ export async function POST(req: Request) {
         const uint8Array = new Uint8Array(arrayBuffer);
 
         const transcript = await transcribe({
-            model: ollama.transcriptionModel(process.env.TRANSCRIBE_MODEL!),
+            model: ollama.transcriptionModel 
+                ? ollama.transcriptionModel(process.env.TRANSCRIBE_MODEL!)
+                : openai.transcription("gpt-4.1-mini"),
             audio: uint8Array,
         })
 
