@@ -68,3 +68,6 @@ Generate migration file for changes in db schema:
 ```npx drizzle-kit migrate```
 #### Check if ext. vector exists:
 ```select extname, extversion from pg_extension where extname = 'vector';```
+
+### Packages
+Imagekit for file manipulation and storage
