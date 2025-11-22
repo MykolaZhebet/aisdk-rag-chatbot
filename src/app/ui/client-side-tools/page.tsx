@@ -2,16 +2,61 @@
 // See https://ai-sdk.dev/docs/ai-sdk-ui/chatbot
 import React, { useState, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from 'ai';
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai';
 import {Image} from "@imagekit/next";
 
 import type { ChatMessage } from '@/app/api/client-side-tools/route'; 
+
+function buildTransformationUrl(baseUrl: string, transformation: string) {
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}tr=${transformation}`
+
+}
 export default function ClientSideToolsChatPage() { 
      
-    const { messages, sendMessage, status, error, stop } = useChat<ChatMessage>({
+    //addToResult allows add result manually on client
+    const { messages, sendMessage, status, error, stop, addToolResult } = useChat<ChatMessage>({
         transport: new DefaultChatTransport({
             api: '/api/client-side-tools',
         }),
+        //helper determines when automatically continue after AI tool call complete
+        sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+        //This functions runs whe AI call AI tool
+        async onToolCall({ toolCall }) {
+            //Dynamic tool is when input and output is unknown at compile time(MCP tool)
+            //needed for typechecking in toolCall.input property
+            if (toolCall.dynamic) {
+                return;
+            }
+
+            switch (toolCall.toolName) {
+                case "changeImageBackgroud": {
+                        const { imageUrl, backgroundPrompt } = toolCall.input;
+                        const transformation = `e-changebg-prompt-${backgroundPrompt}`
+                        const transormedUrl = buildTransformationUrl(imageUrl, transformation);
+
+                        addToolResult({
+                            tool: 'changeImageBackgroud',
+                            toolCallId: toolCall.toolCallId,
+                            output: transormedUrl,
+                        })
+                    }
+                    
+                    break;
+                case "removeBackground": {
+                        const { imageUrl } = toolCall.input
+                        const transformation = `e-bgremove`
+                        const transormedUrl = buildTransformationUrl(imageUrl, transformation)
+
+                        addToolResult({
+                            tool: 'removeBackground',
+                            toolCallId: toolCall.toolCallId,
+                            output: transormedUrl,
+                        })
+                    }
+                    break;
+            }
+         },
     });
 
     const [input, setInput] = useState('');
@@ -96,7 +141,48 @@ export default function ClientSideToolsChatPage() {
                                                 </div>)
                                             default:        
                                                 return `No handler for state ${part} of generateImage tool`
-                                         }
+                                        }
+                                    case 'tool-changeImageBackgroud':
+                                        switch (part.state) {
+                                            case 'input-available':
+                                                return (
+                                                    <p>Changing beckground to: ${part.input.backgroundPrompt}</p>
+                                                )
+                                            case 'output-available':
+                                                return (
+                                                    <div>
+                                                        <p>Background changed</p>
+                                                        <Image
+                                                            urlEndpoint={process.env.IMAGEKIT_URL_ENDPOINT}
+                                                            src={part.output}
+                                                            alt='Transformed image'
+                                                            width={600}
+                                                            height={600}
+                                                        />
+                                                    </div>
+                                                )
+                                        }
+                                    case 'tool-removeBackground':
+                                        switch (part.state) {
+                                            case 'input-available':
+                                                return (
+                                                    <p>Remove beckground...</p>
+                                                )
+                                            case 'output-available':
+                                                return (
+                                                    <div>
+                                                        <p>Background removed</p>
+                                                        <Image
+                                                            urlEndpoint={process.env.IMAGEKIT_URL_ENDPOINT}
+                                                            src={part.output}
+                                                            alt='Transformed image'
+                                                            width={600}
+                                                            height={600}
+                                                        />
+                                                    </div>
+                                                )
+                                        }
+                                
                                     default:
                                         return <span key={index}>Unsuported type of chat message: { part.type}</span>;
                                     }

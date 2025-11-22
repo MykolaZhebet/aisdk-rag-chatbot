@@ -52,6 +52,23 @@ const tools = {
             const imageUrl = await uploadImage(image.base64)
             return imageUrl
         },
+    }),
+    //This tool doesn't have "execute" function because it is client-side tool(ImageKit url query parameter)
+    changeImageBackgroud: tool({
+        description: 'Replace image background with AI=generated scenes based on text prompt',
+        inputSchema: z.object({
+            imageUrl: z.string().describe('URL of the uploaded image'),
+            backgroundPrompt: z.string().describe(`Description of the background(e.g., "modern office", "tropical beach sunset")`),
+        }),
+        outputSchema: z.string().describe('The transformed image URL'),
+    }),
+    //This tool doesn't have "execute" function because it is client-side tool(ImageKit url query parameter)
+    removeBackground: tool({
+        description: 'Remove the background of an image',
+        inputSchema: z.object({
+            imageUrl: z.string().describe('URL of the uploaded image')
+        }),
+        outputSchema: z.string().describe('The transformed image URL')
     })
 }
 
@@ -66,7 +83,7 @@ export async function POST(req: Request) {
             model: ollama(process.env.CHAT_MODEL!),
             messages: convertToModelMessages(messages),
             tools,
-            stopWhen: stepCountIs(2)
+            stopWhen: stepCountIs(3)
         });
 
         result.usage.then((usage) => {
