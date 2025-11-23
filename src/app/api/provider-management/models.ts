@@ -2,9 +2,12 @@ import { openai as originalOpenAI } from "@ai-sdk/openai";
 import {
     customProvider,
     defaultSettingsMiddleware,
-    wrapLanguageModel
- } from 'ai';
-export const openai = customProvider({
+    wrapLanguageModel,
+    createProviderRegistry
+} from 'ai';
+import { anthropic } from "@ai-sdk/anthropic";
+
+export const customOpenAI = customProvider({
     languageModels: {
         fast: originalOpenAI('gpt-5-nano'),
         smart: originalOpenAI('gpt-5-mini'),
@@ -22,4 +25,19 @@ export const openai = customProvider({
         })
     },
     fallbackProvider: originalOpenAI
+})
+
+
+const customAnthropic = customProvider({
+    languageModels: {
+        fast: anthropic('claude-3-5-haiku'),
+        smart: anthropic('claude-sonnet-4')
+
+    }
+}) 
+//openai:fast
+//anthropic:smart
+export const registry = createProviderRegistry({
+    openai: customOpenAI,
+    antropic: customAnthropic,
 })

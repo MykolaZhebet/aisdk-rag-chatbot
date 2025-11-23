@@ -2,14 +2,15 @@ import { streamText, UIMessage, convertToModelMessages } from 'ai';
 import { config } from "dotenv";
 import { ollama } from 'ollama-ai-provider-v2';
 config({ path: ".env.local" });
-import { openai } from './models';
+import { customOpenAI, registry } from './models';
 export async function POST(req: Request) {
-    try {
+    try { 
         //Array of all history
         const { messages }: { messages: UIMessage[] } = await req.json();
     
         const result = streamText({
-            model: openai.languageModel('reasoning'),
+            // model: customOpenAI.languageModel('reasoning'),
+            model: registry.languageModel('openai:fast'),
             // model: ollama(process.env.CHAT_MODEL!),
             // system: 'You are a helpuful assistant',
             messages: convertToModelMessages(messages),
