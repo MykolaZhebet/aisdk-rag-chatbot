@@ -70,4 +70,10 @@ Generate migration file for changes in db schema:
 ```select extname, extversion from pg_extension where extname = 'vector';```
 
 ### Packages
-Imagekit for file manipulation and storage
+- Imagekit for file manipulation and storage
+
+## Services
+- https://www.mockmcp.com/ for mocking mcp invokes
+- https://www.weatherapi.com for fetching weather forecasts
+- imagekit.io for storing and changing images by API
+- clerk.com as auth provider
