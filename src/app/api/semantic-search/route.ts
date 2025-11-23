@@ -29,7 +29,9 @@ export async function POST(req: Request) {
     })
     moviesWithScores.sort((a,b) => b.similarity - a.similarity)
     // return Response.json({results: moviesWithScores})
-    const topResults = moviesWithScores.slice(0, 5);
+    const threshold = 0.4;
+    const relevantResults = moviesWithScores.filter((movie) => movie.similarity > threshold);
+    const topResults = relevantResults.slice(0, 5);
     return Response.json({results: topResults})
     //Calclulate similarity between movie description and search query  
 }
